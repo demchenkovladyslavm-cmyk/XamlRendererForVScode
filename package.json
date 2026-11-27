@@ -1,7 +1,7 @@
 {
   "name": "xaml-renderer",
-  "displayName": "WinForms C#",
-  "description": "real-time winform designer",
+  "displayName": "Xaml renderer for WPF",
+  "description": "real-time xaml window designer",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.105.0"
