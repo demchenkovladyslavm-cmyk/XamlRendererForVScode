@@ -1,71 +1,155 @@
-# xamlRenderer README
+# XAML Renderer for Visual Studio Code
 
-This is the README for your extension "xamlRenderer". After writing up a brief description, we recommend including the following sections.
+Розширення для Visual Studio Code, призначене для попереднього перегляду
+інтерфейсів WPF, описаних мовою XAML. Розширення аналізує XAML-документ,
+перетворює підтримувані елементи та їхні властивості на HTML/CSS і
+відображає результат у вбудованому Webview редактора.
 
-## Features
+## Можливості
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+-   Відображення XAML-інтерфейсу без запуску окремого WPF-застосунку.
+-   Перетворення підтримуваних WPF-елементів у відповідні HTML-елементи
+    та CSS-стилі.
+-   Попередній перегляд документа у Visual Studio Code.
+-   Оновлення попереднього перегляду після збереження XAML-файлу.
+-   Перехід від елемента у Preview до відповідного місця у вихідному
+    XAML-коді.
+-   Обробка базових властивостей компонування, розмірів, кольорів і
+    стилізації.
 
-For example if there is an image subfolder under your extension project workspace:
+## Підтримувані елементи
 
-\!\[feature X\]\(images/feature-x.png\)
+Поточна реалізація містить підтримку, зокрема, таких елементів:
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+  WPF / XAML      Представлення у Preview
+  --------------- ------------------------------
+  `Window`        Кореневий HTML-контейнер
+  `Grid`          CSS Grid
+  `StackPanel`    Flexbox
+  `UniformGrid`   CSS Grid
+  `Border`        HTML-контейнер із CSS-рамкою
+  `Button`        HTML `button`
+  `TextBlock`     Текстовий елемент
+  `TextBox`       HTML `input`
+  `Image`         HTML `img`
 
-## Requirements
+Підтримка окремих властивостей залежить від реалізованого перетворювача.
+Відображення у Preview є наближеним представленням WPF-інтерфейсу, а не
+повноцінним виконанням WPF.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+## Архітектура
 
-## Extension Settings
+Загальний процес обробки документа:
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+1.  Розширення отримує активний XAML-документ у VS Code.
+2.  Аналізатор розбирає його структуру та формує дерево елементів.
+3.  Механізм зіставлення визначає HTML-представлення для підтримуваних
+    XAML-компонентів.
+4.  Генератор формує HTML і CSS.
+5.  Результат передається у VS Code Webview для відображення.
+6.  Після збереження документа Preview оновлюється.
 
-For example:
+Основні частини реалізації:
 
-This extension contributes the following settings:
+-   **VS Code Extension API** --- інтеграція з редактором і керування
+    Webview.
+-   **XAML Analyzer** --- аналіз структури XAML.
+-   **Control Tree** --- внутрішнє дерево елементів інтерфейсу.
+-   **Component Mapping** --- зіставлення XAML-компонентів із
+    HTML-представленнями.
+-   **HTML/CSS Generator** --- формування розмітки та стилів.
+-   **Webview** --- відображення результату у VS Code.
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+## Вимоги
 
-## Known Issues
+Для розробки та запуску розширення потрібні:
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+-   [Visual Studio Code](https://code.visualstudio.com/)
+-   [Node.js](https://nodejs.org/) (рекомендовано актуальну LTS-версію)
+-   npm, який встановлюється разом із Node.js
 
-## Release Notes
+Перевірити наявність Node.js та npm можна командами:
 
-Users appreciate release notes as you update your extension.
+``` bash
+node --version
+npm --version
+```
 
-### 1.0.0
+## Встановлення та запуск у режимі розробки
 
-Initial release of ...
+1.  Клонуйте репозиторій або завантажте його вихідний код.
 
-### 1.0.1
+2.  Відкрийте кореневу папку проєкту у Visual Studio Code.
 
-Fixed issue #.
+3.  Відкрийте інтегрований термінал і встановіть залежності:
 
-### 1.1.0
+    ``` bash
+    npm install
+    ```
 
-Added features X, Y, and Z.
+4.  Скомпілюйте TypeScript-код:
 
----
+    ``` bash
+    npm run compile
+    ```
 
-## Following extension guidelines
+5.  Натисніть `F5` у Visual Studio Code. Також можна відкрити панель
+    **Run and Debug** та запустити конфігурацію **Run Extension**, якщо
+    вона визначена у `.vscode/launch.json`.
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+6.  Відкриється нове вікно **Extension Development Host** із запущеним
+    розширенням.
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+Якщо у `package.json` визначено скрипт `watch`, для автоматичної
+компіляції під час розробки можна виконати:
 
-## Working with Markdown
+``` bash
+npm run watch
+```
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+## Використання
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+1.  У вікні **Extension Development Host** відкрийте папку або проєкт із
+    XAML-файлами.
+2.  Відкрийте потрібний файл `.xaml`.
+3.  Запустіть команду розширення `xamlRenderer.render` через Command
+    Palette (`Ctrl+Shift+P`), якщо Preview ще не відкрито.
+4.  Перегляньте згенерований інтерфейс у Webview.
+5.  Змініть XAML-код і збережіть файл (`Ctrl+S`), щоб оновити попередній
+    перегляд.
 
-## For more information
+Назва команди та спосіб відкриття Preview мають відповідати її
+оголошенню в `package.json` і реалізації розширення.
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+## Обмеження
 
-**Enjoy!**
+Розширення не є повноцінним рушієм WPF і не відтворює всі можливості
+платформи. Зокрема, поточна реалізація має обмежену або відсутню
+підтримку таких механізмів:
+
+-   `Binding` та пов'язаних із ним механізмів оновлення даних;
+-   `Triggers`;
+-   `ControlTemplate` і `DataTemplate`;
+-   `DynamicResource`;
+-   анімацій;
+-   користувацьких WPF-контролів;
+-   поведінки та подій, специфічних для WPF.
+
+Також парсер у поточній версії використовує спрощений підхід до аналізу
+XAML, тому складні XML-конструкції можуть оброблятися некоректно.
+Результат Preview слід використовувати для швидкої візуальної оцінки
+інтерфейсу, а не як точну заміну рендерингу WPF.
+
+## Розробка та налагодження
+
+-   Вихідний код розширення редагується у звичайному вікні VS Code.
+-   Для перевірки змін запустіть компіляцію або `npm run watch`.
+-   Для тестування відкривайте XAML-файли у вікні **Extension
+    Development Host**.
+-   Помилки розширення можна переглядати через **View → Output**,
+    **Developer: Toggle Developer Tools** та Debug Console.
+
+## Ліцензія
+
+Додайте інформацію про ліцензію відповідно до умов розповсюдження
+проєкту.
